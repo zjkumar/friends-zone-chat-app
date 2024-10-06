@@ -1,9 +1,10 @@
 const dotenv = require('dotenv')
+dotenv.config()
 const express = require('express')
 const { chats } = require('./data/data')
 const userRoutes = require('./routes/userRoutes')
 
-dotenv.config()
+
 
 const connectDB = require("./config/db")
 connectDB();

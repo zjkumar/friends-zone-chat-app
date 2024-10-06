@@ -42,4 +42,4 @@ const registerUser = asyncHandler(async (req, res) => {
 })
 
 
-module.exports = router
+module.exports = {registerUser}
