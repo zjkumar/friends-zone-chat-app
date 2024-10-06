@@ -7,6 +7,7 @@ const userRoutes = require('./routes/userRoutes')
 
 
 const connectDB = require("./config/db")
+const notFoundRoute = require('./middleware/notFoundRoute')
 connectDB();
 
 const PORT = process.env.PORT || 5000;
@@ -18,5 +19,7 @@ app.get('/', (req, res) => {
 })
 
 app.use("/api/user", userRoutes)
+
+app.use(notFoundRoute)
 
 app.listen(PORT, console.log(`server started on port ${PORT}`))
