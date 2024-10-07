@@ -4,7 +4,4 @@ const notFoundRoute = (req, res, next) => {
     next(error)
 }
 
-
-
-
 module.exports = notFoundRoute
