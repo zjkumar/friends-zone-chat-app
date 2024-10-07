@@ -4,7 +4,7 @@ import { Container, Box, Text, Tabs, Tab, TabList, TabPanels, TabPanel } from '@
 import Login from '../components/Authentication/Login'
 import Signup from '../components/Authentication/Signup'
 // import "./styles.css"
-const Homepage = () => {
+const LoginPage = () => {
   return (
     <Container maxW="xl" color="black" centerContent  >
       <Box
@@ -48,4 +48,4 @@ const Homepage = () => {
   )
 }
 
-export default Homepage
+export default LoginPage
