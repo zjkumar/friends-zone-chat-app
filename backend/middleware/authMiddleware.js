@@ -3,6 +3,8 @@ const User = require('../models/userModel')
 const asyncHandler = require('express-async-handler')
 
 const authentication = asyncHandler(async (req, res, next) => {
+    
+    console.log('provide token')
     let token;
     if (
         req.headers.authorization &&
@@ -24,6 +26,7 @@ const authentication = asyncHandler(async (req, res, next) => {
     }
 
     if (!token) {
+
         res.status(401);
         throw new Error("Not Authorized, Provide Token!")
     }

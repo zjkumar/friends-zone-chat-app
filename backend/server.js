@@ -3,6 +3,7 @@ dotenv.config()
 const express = require('express')
 const { chats } = require('./data/data')
 const userRoutes = require('./routes/userRoutes')
+const chatRoutes = require('./routes/chatRoutes')
 
 
 
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 })
 
 app.use("/api/user", userRoutes)
+app.use("/api/chat", chatRoutes)
 
 app.use(notFoundRoute)
 
