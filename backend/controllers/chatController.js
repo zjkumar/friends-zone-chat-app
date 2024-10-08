@@ -100,4 +100,57 @@ const createGroupChat = expressAsyncHandler(async(req, res) => {
     }
 })
 
-module.exports = {accessChat, fetchChats, createGroupChat}
+const renameGroup = expressAsyncHandler(async(req, res) => {
+    const {chatId, chatName} = req.body
+    if (!chatId || !chatName) {
+        res.status(401).send({message: "Please provide all the details"})
+        return;
+    }
+
+    try {
+        const updatedChat = await Chat.findByIdAndUpdate(chatId, 
+            {chatName}, {new: true}
+        ).populate("users", "-password").populate("groupAdmin", "-password")
+        res.status(200)
+        res.json(updatedChat)
+
+    }catch(err){
+        res.status(400)
+        throw new Error({message: err.message})
+    }
+
+
+})
+
+const addUserToGroup = expressAsyncHandler(async(req, res) => {
+    
+    const {userId, chatId} = req.body
+    if (!userId || !chatId) {
+        res.status(401)
+        res.send("Provide all details")
+        return
+    }
+
+    try {
+        
+        const updatedChat = await Chat.findByIdAndUpdate(chatId, 
+            {
+                $push: {users: userId}
+            } ,
+            {new: true}
+        ).populate("users", "-password").populate("groupAdmin", "-password")
+
+        res.status(200)
+        res.json(updatedChat)
+        // const updatedChat = currentChat.users.push(userId)
+
+        
+    }catch(err) {
+        res.status(401)
+        throw new Error({message: "Unable to add user to the group"})
+    }
+
+
+})
+
+module.exports = {accessChat, fetchChats, createGroupChat, renameGroup, addUserToGroup}

@@ -4,7 +4,6 @@ const asyncHandler = require('express-async-handler')
 
 const authentication = asyncHandler(async (req, res, next) => {
     
-    console.log('provide token')
     let token;
     if (
         req.headers.authorization &&
