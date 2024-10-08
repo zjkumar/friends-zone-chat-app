@@ -153,4 +153,39 @@ const addUserToGroup = expressAsyncHandler(async(req, res) => {
 
 })
 
-module.exports = {accessChat, fetchChats, createGroupChat, renameGroup, addUserToGroup}
+
+const removeUserFromGroup = expressAsyncHandler(async(req, res) => {
+    const {userId, chatId} = req.body
+
+    if (!userId || !chatId) {
+        res.status(401)
+        res.send("Provide all details")
+        return
+    }
+
+    try {
+        const updatedChat = await Chat.findByIdAndUpdate(chatId, 
+            {
+                $pull: {users: userId}
+            },
+            {new: true}
+        ).populate('users', '-password').populate('groupAdmin', '-password')
+
+        res.status(200)
+        res.json(updatedChat)
+    }catch(err){
+        res.status(401)
+        throw new Error({message: "Unable to remove user from the group"})
+    }
+
+})
+
+
+module.exports = {
+    accessChat, 
+    fetchChats, 
+    createGroupChat, 
+    renameGroup, 
+    addUserToGroup, 
+    removeUserFromGroup
+}
