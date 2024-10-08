@@ -16,7 +16,7 @@ const authentication = asyncHandler(async (req, res, next) => {
             const decodedToken = jwt.verify(token, `${process.env.JWT_SECRET}`)
 
             // assigning the user using the decoded token
-            req.user = await User.findById(decodedToken.id).select("password")
+            req.user = await User.findById(decodedToken.id).select("-password")
             
             next()
         }catch(err) {

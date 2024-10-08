@@ -61,5 +61,43 @@ const fetchChats = expressAsyncHandler(async (req, res) => {
 })
 
 
+const createGroupChat = expressAsyncHandler(async(req, res) => {
+    // if the body doesn't have list of users or if it doesn't have a name for the group
+    if (!req.body.users || !req.body.name) {
+        return res.status(400).send({message: "Please fill all the details"})
+    }
 
-module.exports = {accessChat, fetchChats}
+    let users = JSON.parse(req.body.users);
+
+    // group should be more than 1 user
+    if (users.length < 2) {
+        return res.status(400).send({message: "A group must have more than 1 user"})
+    }
+
+    // current logged in user is the one who is sending request to create the group
+    // so he is also part of the users list of the group
+    // so we add him to the list
+
+    users.push(req.user);
+
+    try {
+        const groupChat = await Chat.create({
+            chatName: req.body.name,
+            users: users,
+            isGroupChat: true,
+            groupAdmin: req.user
+        })
+
+        const fullGroupChat = await Chat.findOne({_id: groupChat._id})
+        .populate("users", "-password")
+        .populate("latestMessage")
+        .populate("groupAdmin", "-password")
+        
+        res.status(200).send(fullGroupChat)
+
+    }catch(err) {
+        res.status(400).send({message: err.message})
+    }
+})
+
+module.exports = {accessChat, fetchChats, createGroupChat}
