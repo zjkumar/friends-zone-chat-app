@@ -44,5 +44,22 @@ const accessChat = expressAsyncHandler(async(req, res) => {
 })
 
 
+const fetchChats = expressAsyncHandler(async (req, res) => {
+    try {
+        // iterates through all the documents in the Chat collection
+        // and fetches the chats where the user is part of that chat.
+        const result = await Chat.find({users: { $elemMatch : { $eq: req.user._id }}})
+        .populate("users", "-password")
+        .populate("latestMessage")
+        .populate("groupAdmin")
+        .sort({updatedAt: -1})
+        
+        res.status(200).send(result)
+    }catch(err) {
+        throw new Error(err.message)
+    }
+})
 
-module.exports = {accessChat}
+
+
+module.exports = {accessChat, fetchChats}
