@@ -14,7 +14,7 @@ const SideDrawer = () => {
     const [loading, setLoading] = useState(false)
     const [loadingChat, setLoadingChat] = useState()
     const navigate = useNavigate()
-    const {user} = ChatState()
+    const {user, chats, setChats, setSelectedChat} = ChatState()
     const {isOpen, onOpen, onClose} = useDisclosure()
 
 
@@ -62,9 +62,34 @@ const SideDrawer = () => {
           }
     }
 
-    const accessChat = userId => {
-
-    }
+    const accessChat = async (userId) => {
+      console.log(userId);
+  
+      try {
+        setLoadingChat(true);
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        };
+        const { data } = await axios.post(`/api/chat`, { userId }, config);
+  
+        if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+        setSelectedChat(data);
+        setLoadingChat(false);
+        onClose();
+      } catch (error) {
+        toast({
+          title: "Error fetching the chat",
+          description: error.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom-left",
+        });
+      }
+    };
  
     return (
     <>
@@ -78,9 +103,9 @@ const SideDrawer = () => {
             borderWidth="5px"
         >
             <Tooltip label="Search Users to chat" hasArrow placement='bottom-end'>
-                <Button variant="ghost" onClick={onOpen} >
+                <Button variant="ghost" onClick={onOpen}  >
                     <i className="fas fa-search"></i>
-                <Text >Search User</Text>
+                    <Text marginLeft={"10px"}>Search User</Text>
                 </Button>
 
             </Tooltip>
