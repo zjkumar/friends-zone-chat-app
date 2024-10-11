@@ -4,6 +4,7 @@ const express = require('express')
 const { chats } = require('./data/data')
 const userRoutes = require('./routes/userRoutes')
 const chatRoutes = require('./routes/chatRoutes')
+const messageRoutes = require('./routes/messageRoutes')
 
 
 
@@ -19,8 +20,15 @@ app.get('/', (req, res) => {
     res.send('API is running')
 })
 
+// route for user login and signup
 app.use("/api/user", userRoutes)
+
+// route for chat functionality
 app.use("/api/chat", chatRoutes)
+
+// route for messaging functionality
+app.use("/api/message", messageRoutes)
+
 
 app.use(notFoundRoute)
 
