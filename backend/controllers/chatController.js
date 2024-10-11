@@ -103,8 +103,9 @@ const createGroupChat = expressAsyncHandler(async(req, res) => {
 const renameGroup = expressAsyncHandler(async(req, res) => {
     const {chatId, chatName} = req.body
     if (!chatId || !chatName) {
-        res.status(401).send({message: "Please provide all the details"})
-        return;
+        res.status(401)
+        throw new Error("Please provide all the details")
+        
     }
 
     try {
@@ -116,7 +117,7 @@ const renameGroup = expressAsyncHandler(async(req, res) => {
 
     }catch(err){
         res.status(400)
-        throw new Error({message: err.message})
+        throw new Error(err.message)
     }
 
 

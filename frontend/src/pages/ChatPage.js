@@ -7,7 +7,7 @@ import { useState } from "react";
 
 const Chatpage = () => {
   const { user } = ChatState();
-  const {fetchAgain, setFetchAgain} = useState(false)
+  const [fetchAgain, setFetchAgain] = useState(false)
 
   return (
     <div style={{ width: "100%" }}>
