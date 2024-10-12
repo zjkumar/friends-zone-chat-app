@@ -44,6 +44,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const authUser = expressAsyncHandler(async(req, res) => {
     const {email, password} = req.body;
+    console.log(password)
     if (!email || !password) {
         res.status(401)
         throw new Error("Provide all the details")
