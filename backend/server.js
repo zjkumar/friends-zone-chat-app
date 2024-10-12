@@ -44,4 +44,34 @@ const io = require('socket.io')(server, {
 
 io.on("connection", (socket) => {
     console.log("Connected to socket.io")
+
+    // Every time user opens the app, he should be connected to his own personal socket
+    
+    // creating a new socket where frontend sends userData and this is particular for that one user.
+    socket.on('setup', (userData) => {
+        socket.join(userData._id);
+        socket.emit("connected");
+    })
+
+    // joining a chat, roomId is send from frontend
+    socket.on('join chat', (room) => {
+        socket.join(room)
+        console.log("User Joined Room: " + room + " " )
+    })
+
+    socket.on('new message', (newMessageReceived) => {
+        var chat = newMessageReceived.chat
+        if (!chat.users) return "chat.users not defined"
+
+        // if we are in a group and we are sending a message
+        // we want to emit the message to all other participants in the group except for the user who sends it.
+        
+        chat.users.forEach(user => {
+            if (user._id !== newMessageReceived.sender._id) {
+                // we will be sending the newMessageReceived object to the user.
+                // frontend will take care of which chat the message belongs to, etc.
+                socket.in(user._id).emit('message received', newMessageReceived)
+            }
+        });
+    })
 })

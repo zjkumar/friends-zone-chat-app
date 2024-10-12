@@ -9,6 +9,11 @@ import axios from 'axios'
 import './styles.css'
 import ScrollableChat from './miscellaneous/ScrollableChat'
 
+import io from 'socket.io-client'
+
+
+const ENDPOINT = "http://localhost:5000"
+var socket, selectedChatCompare;
 
 const SingleChat = ({fetchAgain, setFetchAgain}) => {
     const [messages, setMessages] = useState([]);
@@ -16,7 +21,18 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
   const [newMessage, setNewMessage] = useState("");
     const {user, selectedChat, setSelectedChat} = ChatState()
 
+    const [socketConnected, setSocketConnected] = useState(false)
+
     const toast = useToast()
+
+
+    // this useEffect should be at the top, so socket gets initialized first.
+    useEffect(() => {
+        socket = io(ENDPOINT)
+        socket.emit("setup", user);
+        socket.on("connection", () => setSocketConnected(true))
+    }, [])
+
 
     const fetchMessages = async() => {
         if (!selectedChat) {
@@ -35,6 +51,9 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
             console.log(data)
             setMessages(data)
             setLoading(false)
+
+            // joining the room and sending the room id
+            socket.emit("join chat", selectedChat._id)
         }
         catch(err) {
             toast({
@@ -66,8 +85,8 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
                 }, config)
 
                 console.log(data)
-
-                setMessages({...messages, data})
+                socket.emit("new message", data)
+                setMessages([...messages, data])
 
             } 
             catch(err) {
@@ -91,10 +110,25 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
 
     useEffect(() => {
         fetchMessages();
+        selectedChatCompare = selectedChat
     
         // eslint-disable-next-line
       }, [selectedChat]);
 
+    
+    
+
+    useEffect(() => {
+        socket.on("message received", (newMessageReceived) => {
+            // if none of the chat is selected or if the selected chat is different from the newMessageReceivedChat,
+            // we are not going 2 display message, we giv notification
+            if ( !selectedChatCompare || selectedChatCompare._id !== newMessageReceived.chat._id) {
+                // give notification
+            }else{
+                setMessages([...messages, newMessageReceived])
+            }
+        })
+    })
 
   return (
     <>
