@@ -32,11 +32,11 @@ app.use("/api/message", messageRoutes)
 __dirname = path.resolve()
 if (process.env.NODE_ENV === "production") {
     // Serve static files from the frontend build directory
-    app.use(express.static(path.join(__dirname, "..", "frontend", "build")));
+    app.use(express.static(path.join(__dirname, "frontend", "build")));
 
     // Catch-all handler: return index.html for all unknown routes
     app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "..", "frontend", "build", "index.html")); // Corrected the path here
+        res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html")); // Corrected the path here
     });
 } else {
     // API root route for development mode
