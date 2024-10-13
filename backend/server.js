@@ -5,7 +5,7 @@ const { chats } = require('./data/data')
 const userRoutes = require('./routes/userRoutes')
 const chatRoutes = require('./routes/chatRoutes')
 const messageRoutes = require('./routes/messageRoutes')
-
+const path = require("path")
 
 
 const connectDB = require("./config/db")
@@ -16,9 +16,7 @@ const PORT = process.env.PORT || 5000;
 const app = express()
 app.use(express.json()); // tell the server to accept json data, otherwise many errors like jwt token error as well.
 
-app.get('/', (req, res) => {
-    res.send('API is running')
-})
+
 
 // route for user login and signup
 app.use("/api/user", userRoutes)
@@ -28,6 +26,25 @@ app.use("/api/chat", chatRoutes)
 
 // route for messaging functionality
 app.use("/api/message", messageRoutes)
+
+// deployment code
+
+__dirname = path.resolve()
+if (process.env.NODE_ENV === "production") {
+    // Serve static files from the frontend build directory
+    app.use(express.static(path.join(__dirname, "..", "frontend", "build")));
+
+    // Catch-all handler: return index.html for all unknown routes
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "..", "frontend", "build", "index.html")); // Corrected the path here
+    });
+} else {
+    // API root route for development mode
+    app.get('/', (req, res) => {
+        res.send('API is running successfully');
+    });
+}
+// deployment code
 
 
 app.use(notFoundRoute)
