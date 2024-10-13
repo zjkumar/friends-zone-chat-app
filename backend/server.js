@@ -1,4 +1,5 @@
 const dotenv = require('dotenv')
+const cors = require("cors")
 dotenv.config()
 const express = require('express')
 const { chats } = require('./data/data')
@@ -16,6 +17,18 @@ const PORT = process.env.PORT || 5000;
 const app = express()
 app.use(express.json()); // tell the server to accept json data, otherwise many errors like jwt token error as well.
 
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow localhost for development and any other platform-originated requests
+        if (origin === "http://localhost:3000" || origin.includes(".onrender.com") || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+};
+
+app.use(cors(corsOptions));
 
 
 // route for user login and signup
