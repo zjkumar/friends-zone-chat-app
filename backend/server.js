@@ -69,9 +69,14 @@ io.on("connection", (socket) => {
         chat.users.forEach(user => {
             if (user._id !== newMessageReceived.sender._id) {
                 // we will be sending the newMessageReceived object to the user.
-                // frontend will take care of which chat the message belongs to, etc.
+                // we are targeting specific location or room and emiting 
                 socket.in(user._id).emit('message received', newMessageReceived)
             }
         });
     })
+
+    // socket for typing
+    socket.on("typing", (room) => socket.in(room).emit("typing"))
+
+    socket.on("stop typing", (room) => socket.in(room).emit("stop typing") )
 })
