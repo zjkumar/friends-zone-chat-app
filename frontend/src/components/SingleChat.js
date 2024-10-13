@@ -22,7 +22,6 @@ const defaultOptions = {
     },
   };
 
-  var typingTimeout;
 
 const ENDPOINT = "http://localhost:5000"
 var socket, selectedChatCompare;
@@ -31,7 +30,7 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
     const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-    const {user, selectedChat, setSelectedChat} = ChatState()
+    const {user, selectedChat, setSelectedChat, notification, setNotification} = ChatState()
 
     const [socketConnected, setSocketConnected] = useState(false)
     const [typing, setTyping] = useState(false)
@@ -68,7 +67,7 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
             setLoading(true)
             const {data} = await axios.get(`/api/message/${selectedChat._id}`, config)
 
-            console.log(data)
+            // console.log(data)
             setMessages(data)
             setLoading(false)
 
@@ -105,7 +104,7 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
                     chatId: selectedChat._id
                 }, config)
 
-                console.log(data)
+                // console.log(data)
                 socket.emit("new message", data)
                 setMessages([...messages, data])
 
@@ -125,7 +124,7 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
 
     const typingHandler = async (e) => {
         setNewMessage(e.target.value);
-        console.log(typing, "status of typing before function return");
+        // console.log(typing, "status of typing before function return");
       
         if (!socketConnected) return;
       
@@ -136,7 +135,7 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
       
         // Emit stop typing and reset typing state if already typing
         if (!typingRef.current) {
-          console.log("inside if - starting typing");
+        //   console.log("inside if - starting typing");
           setTyping(true); // Set typing state
           typingRef.current = true; // Ref updated immediately
           socket.emit("typing", selectedChat._id); // Emit typing event
@@ -144,52 +143,13 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
       
         // Set a new timeout to stop typing after 2 seconds of inactivity
         typingTimeoutRef.current = setTimeout(() => {
-          console.log("setTimeout triggered");
+        //   console.log("setTimeout triggered");
           socket.emit("stop typing", selectedChat._id);
           setTyping(false); // Set typing state to false
           typingRef.current = false; // Ref updated to reflect typing stopped
-          console.log("stop typing emitted");
+        //   console.log("stop typing emitted");
         }, 2000); // Timeout of 2 seconds
       };
-
-    // const typingHandler = async (e) => {
-    //     setNewMessage(e.target.value);
-    //     console.log(typing, "status of typing before function return")
-    //     if (!socketConnected) return;
-
-    //     if (typingTimeout) {
-    //         clearTimeout(typingTimeout)
-    //         setTyping(false)
-    //         typingRef.current = false
-    //         socket.emit("stop typing", selectedChat._id)
-    //     }
-
-    //     console.log("before if", "!typingRef.current: ", !typingRef.current, "typing: ", typing )
-    //     if (!typingRef.current) {
-    //         console.log("inside if")
-    //         setTyping(true)
-    //         typingRef.current = true
-    //         socket.emit("typing", selectedChat._id)
-    //     }
-    //     console.log("after if")
-
-    //     let lastTypingTime = new Date().getTime()
-    //     var timerLength = 2000;
-        
-    //     setTimeout(() => {
-    //         var timeNow = new Date().getTime()
-            
-    //         var timeDiff = timeNow - lastTypingTime
-            
-    //         console.log(timeDiff >= timerLength && typingRef.current, timerLength, typingRef.current, "from settimeout")
-    //         if (timeDiff >= timerLength && typingRef.current) {
-    //             socket.emit("stop typing", selectedChat._id)
-    //             setTyping(false)
-    //             typingRef.current = true
-    //             console.log("if condition executed")
-    //         }
-    //     }, timerLength)
-    // }
 
     useEffect(() => {
         fetchMessages();
@@ -206,12 +166,17 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
             // if none of the chat is selected or if the selected chat is different from the newMessageReceivedChat,
             // we are not going 2 display message, we giv notification
             if ( !selectedChatCompare || selectedChatCompare._id !== newMessageReceived.chat._id) {
-                // give notification
+                if (!notification.includes(newMessageReceived)) {
+                    setNotification([newMessageReceived, ...notification])
+                    setFetchAgain(!fetchAgain)
+                }
             }else{
                 setMessages([...messages, newMessageReceived])
             }
         })
     })
+
+    // console.log(notification, "----------------")
 
   return (
     <>
@@ -291,6 +256,7 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
                             placeholder="Enter a message.."
                             value={newMessage}
                             onChange={typingHandler}
+                            borderRadius={"25px"}
                         />
 
                     </FormControl>
