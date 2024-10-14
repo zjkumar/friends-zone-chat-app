@@ -20,7 +20,7 @@ app.use(express.json()); // tell the server to accept json data, otherwise many 
 const corsOptions = {
     origin: function (origin, callback) {
         // Allow localhost for development and any other platform-originated requests
-        if (origin === "http://localhost:3000" || origin.includes(".onrender.com") || !origin) {
+        if (!origin || origin === "http://localhost:3000" || origin.includes(".onrender.com")) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
